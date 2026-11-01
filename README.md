@@ -1,18 +1,21 @@
 # AI Service Python
 
-Projeto de portfólio para explorar uma API Python com FastAPI, validação de dados e testes automatizados. As funcionalidades disponíveis devem ser conferidas no código em `src/`; o repositório está em desenvolvimento e não representa, por si só, um serviço de IA pronto para produção.
+Módulo Python experimental para análise básica de texto e processamento em lote. Apesar de FastAPI e Uvicorn estarem listados nas dependências, o ponto de entrada atual `src/main.py` é uma biblioteca/exemplo executável por terminal, não uma aplicação FastAPI pronta.
 
-## Stack
+## Funcionalidades atuais
 
-- Python 3.11+
-- FastAPI
-- Uvicorn
-- Pydantic
-- pytest
+- Rejeita texto vazio.
+- Remove espaços externos.
+- Conta palavras.
+- Retorna um rótulo de sentimento heurístico e uma confiança estimada por regra simples.
+- Processa uma lista de textos, ignorando itens vazios.
+
+> O rótulo de sentimento e a confiança são regras didáticas, não previsões de um modelo de Machine Learning validado. Não use os resultados para decisões reais.
 
 ## Requisitos
 
-Python 3.11 ou versão compatível com as dependências do projeto.
+- Python 3.11+ recomendado
+- Dependências em `requirements.txt`
 
 ## Instalação
 
@@ -36,15 +39,11 @@ Instale as dependências:
 python -m pip install -r requirements.txt
 ```
 
-## Executar
-
-Confira o ponto de entrada em `src/`. Se `src/main.py` expuser o objeto ASGI `app`, execute:
+## Executar o exemplo
 
 ```bash
-uvicorn src.main:app --reload
+python src/main.py
 ```
-
-A documentação interativa do FastAPI normalmente fica em `/docs` quando a aplicação está em execução.
 
 ## Testes
 
@@ -56,23 +55,17 @@ pytest
 
 ```text
 .
-├── src/
+├── src/main.py
 ├── tests/
 ├── requirements.txt
 └── README.md
 ```
 
-## Boas práticas
-
-- Não inclua tokens, chaves ou dados pessoais reais nos testes.
-- Valide dados de entrada e padronize respostas de erro.
-- Use testes para comportamento normal, entradas inválidas e falhas de dependências.
-- Não apresente resultados de modelos como confiáveis sem avaliação com dados adequados.
-
 ## Próximas melhorias
 
-- Documentar os endpoints reais e exemplos de requisição.
-- Automatizar testes e verificações de estilo em CI.
-- Adicionar configuração por variáveis de ambiente quando necessário.
+- Separar as regras de análise em funções testáveis.
+- Adicionar testes para entrada vazia, espaços, texto curto e lote misto.
+- Se for necessário expor HTTP, criar uma aplicação FastAPI explícita com schemas Pydantic e documentação dos endpoints.
+- Substituir as heurísticas por um método avaliado e documentar métricas antes de chamá-lo de modelo de IA.
 
-Projeto em desenvolvimento; execute os testes antes de utilizar alterações em outros ambientes.
+Projeto de aprendizagem em evolução.
