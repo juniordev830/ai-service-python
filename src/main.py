@@ -21,7 +21,7 @@ def analyze_text(text: str) -> dict[str, Any]:
         "word_count": word_count,
         "sentiment": sentiment,
         "confidence": confidence,
-        "language": "en",
+        "language": "undetermined",
     }
 
 
