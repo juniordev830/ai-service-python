@@ -1,44 +1,78 @@
 # AI Service Python
 
-An AI and Machine Learning microservice built with Python and FastAPI, demonstrating modern RESTful API design and asynchronous data processing pipelines.
+Projeto de portfólio para explorar uma API Python com FastAPI, validação de dados e testes automatizados. As funcionalidades disponíveis devem ser conferidas no código em `src/`; o repositório está em desenvolvimento e não representa, por si só, um serviço de IA pronto para produção.
 
-## 🚀 Features
+## Stack
 
-- **FastAPI**: Asynchronous high-performance web framework.
-- **Data Processing**: Pipeline for text and data classification.
-- **Pytest Integration**: Complete unit test suite.
+- Python 3.11+
+- FastAPI
+- Uvicorn
+- Pydantic
+- pytest
 
-## 🛠️ Tech Stack
+## Requisitos
 
-- **Language**: Python 3.11+
-- **Framework**: FastAPI / Uvicorn
-- **Testing**: Pytest
+Python 3.11 ou versão compatível com as dependências do projeto.
 
-## 📦 Getting Started
-
-### Prerequisites
-- Python >= 3.11
-
-### Installation
+## Instalação
 
 ```bash
-# Clone repository
-git clone https://github.com/YOUR_USERNAME/ai-service-python.git
-
-# Navigate to project
-cd ai-service-python
-
-# Create virtual environment
-python -m venv venv
-source venv/bin/activate  # On Windows: venv\Scripts\activate
-
-# Install dependencies
-pip install -r requirements.txt
-
-# Run server
-python src/main.py
+python -m venv .venv
 ```
 
-## 📜 License
+Ative o ambiente:
 
-This project is licensed under the MIT License.
+```bash
+# Windows PowerShell
+.\.venv\Scripts\Activate.ps1
+
+# Linux/macOS
+source .venv/bin/activate
+```
+
+Instale as dependências:
+
+```bash
+python -m pip install -r requirements.txt
+```
+
+## Executar
+
+Confira o ponto de entrada em `src/`. Se `src/main.py` expuser o objeto ASGI `app`, execute:
+
+```bash
+uvicorn src.main:app --reload
+```
+
+A documentação interativa do FastAPI normalmente fica em `/docs` quando a aplicação está em execução.
+
+## Testes
+
+```bash
+pytest
+```
+
+## Estrutura
+
+```text
+.
+├── src/
+├── tests/
+├── requirements.txt
+└── README.md
+```
+
+## Boas práticas
+
+- Não inclua tokens, chaves ou dados pessoais reais nos testes.
+- Valide dados de entrada e padronize respostas de erro.
+- Use testes para comportamento normal, entradas inválidas e falhas de dependências.
+- Não apresente resultados de modelos como confiáveis sem avaliação com dados adequados.
+
+## Próximas melhorias
+
+- Documentar os endpoints reais e exemplos de requisição.
+- Automatizar testes e verificações de estilo em CI.
+- Adicionar configuração por variáveis de ambiente quando necessário.
+
+Projeto em desenvolvimento; execute os testes antes de utilizar alterações em outros ambientes.
