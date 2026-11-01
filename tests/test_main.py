@@ -10,6 +10,7 @@ def test_analyze_text_success():
     assert result["word_count"] == 6
     assert result["sentiment"] == "positive"
     assert result["confidence"] > 0.5
+    assert result["language"] == "undetermined"
 
 
 def test_analyze_text_short():
@@ -43,3 +44,7 @@ def test_batch_analyze_rejects_non_list():
 def test_batch_analyze_rejects_non_string_item():
     with pytest.raises(TypeError, match=r"texts\[1\] must be a string"):
         batch_analyze(["valid text", None])
+
+def test_language_is_not_claimed_without_language_detection():
+    result = analyze_text("Olá, este é um texto em português")
+    assert result["language"] == "undetermined"
