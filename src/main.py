@@ -13,26 +13,35 @@ _NEGATIVE_WORDS = {
     "negative", "poor", "ruim", "péssimo", "péssima", "triste",
     "odeio", "detestei", "odiei",
 }
-_NEGATION_WORDS = {"not", "no", "never", "não", "nunca", "nem"}
+_NEGATION_WORDS = {
+    "not", "no", "never", "não", "nao", "nunca", "nem",
+    "don't", "doesn't", "didn't", "isn't", "wasn't", "weren't",
+    "can't", "cannot", "won't",
+}
 _CONTRAST_WORDS = {"but", "however", "mas", "porém", "contudo"}
+MAX_TEXT_CHARACTERS = 10_000
+MAX_BATCH_ITEMS = 100
 
 
 def analyze_text(text: str) -> dict[str, Any]:
     """Return basic metadata and a lexicon-based, explicitly heuristic sentiment."""
     if not isinstance(text, str):
         raise TypeError("text must be a string")
+    if len(text) > MAX_TEXT_CHARACTERS:
+        raise ValueError(f"text must contain at most {MAX_TEXT_CHARACTERS} characters")
     cleaned_text = text.strip()
     if not cleaned_text:
         raise ValueError("Input text cannot be empty")
 
     words = cleaned_text.split()
     # Keep sentence punctuation as tokens so negation does not leak across sentences.
-    tokens = re.findall(r"[a-zà-ÿ]+|[.!?;,]", cleaned_text.casefold())
+    tokens = re.findall(r"[a-zà-ÿ]+(?:['’][a-zà-ÿ]+)?|[.!?;,]", cleaned_text.casefold())
     positive_count = 0
     negative_count = 0
     negation_remaining = 0
 
     for token in tokens:
+        token = token.replace("’", "'")
         if token in {".", "!", "?", ";", ","} or token in _CONTRAST_WORDS:
             negation_remaining = 0
             continue
@@ -78,6 +87,8 @@ def batch_analyze(texts: list[str]) -> list[dict[str, Any]]:
     """Analyze a list of strings, ignoring empty or whitespace-only samples."""
     if not isinstance(texts, list):
         raise TypeError("texts must be a list of strings")
+    if len(texts) > MAX_BATCH_ITEMS:
+        raise ValueError(f"batch must contain at most {MAX_BATCH_ITEMS} items")
     results = []
     for index, text in enumerate(texts):
         if not isinstance(text, str):
