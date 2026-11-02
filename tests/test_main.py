@@ -89,3 +89,33 @@ def test_sentiment_handles_simple_negation_and_scope(text, expected):
 def test_language_is_not_claimed_without_language_detection():
     result = analyze_text("Olá, este é um texto em português")
     assert result["language"] == "undetermined"
+
+
+@pytest.mark.parametrize(
+    ("text", "expected"),
+    [
+        ("I don't love this update", "negative"),
+        ("This isn't good", "negative"),
+        ("I can’t hate this", "positive"),
+        ("nao gostei do atendimento", "negative"),
+        ("I won't hate this", "positive"),
+    ],
+)
+def test_negations_with_contractions_and_ascii_portuguese(text, expected):
+    assert analyze_text(text)["sentiment"] == expected
+
+
+def test_oversized_text_is_rejected_before_processing():
+    with pytest.raises(ValueError, match="at most 10000 characters"):
+        analyze_text("a" * 10001)
+
+
+def test_batch_limits_number_of_items():
+    with pytest.raises(ValueError, match="at most 100 items"):
+        batch_analyze(["good"] * 101)
+
+
+def test_batch_accepts_maximum_size_and_checks_each_item_length():
+    assert len(batch_analyze(["good"] * 100)) == 100
+    with pytest.raises(ValueError, match="at most 10000 characters"):
+        batch_analyze(["good", "x" * 10001])

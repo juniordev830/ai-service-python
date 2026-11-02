@@ -8,9 +8,9 @@ Módulo Python experimental para análise básica de texto e processamento em lo
 - Remove espaços externos.
 - Conta palavras.
 - Estima sentimento por um pequeno léxico positivo/negativo em inglês e português.
-- Considera negações simples (`not`, `never`, `não`, `nunca`) em uma janela curta e reinicia o escopo em pontuação ou conectores de contraste.
+- Considera negações simples (`not`, `never`, `não`, `nao`, `nunca`) e contrações comuns em inglês (`don't`, `isn't`, `can't`) em uma janela curta e reinicia o escopo em pontuação ou conectores de contraste.
 - Informa um escore heurístico (`confidence`) e o método usado; esse escore não é uma probabilidade calibrada.
-- Processa uma lista de textos, ignorando itens vazios.
+- Processa uma lista de textos, ignorando itens vazios. Cada texto pode ter até **10.000 caracteres** e cada lote pode conter até **100 itens**, para limitar o trabalho por chamada.
 
 > O rótulo de sentimento e a confiança são regras didáticas, não previsões de um modelo de Machine Learning validado. Não use os resultados para decisões reais.
 
