@@ -1,0 +1,15 @@
+{
+  "schema_version": 1,
+  "project_kind": "Ferramenta de sentimento heurístico Python",
+  "entry_points": [
+    "src/main.py",
+    "tests/test_main.py"
+  ],
+  "test_commands": [
+    "pytest"
+  ],
+  "review_focus": [
+    "Negação e contraste em português/inglês",
+    "Limitações das classificações heurísticas"
+  ]
+}
