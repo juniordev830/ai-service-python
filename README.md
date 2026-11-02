@@ -8,6 +8,7 @@ Módulo Python experimental para análise básica de texto e processamento em lo
 - Remove espaços externos.
 - Conta palavras.
 - Estima sentimento por um pequeno léxico positivo/negativo em inglês e português.
+- Considera negações simples (`not`, `never`, `não`, `nunca`) em uma janela curta e reinicia o escopo em pontuação ou conectores de contraste.
 - Informa um escore heurístico (`confidence`) e o método usado; esse escore não é uma probabilidade calibrada.
 - Processa uma lista de textos, ignorando itens vazios.
 
@@ -64,7 +65,7 @@ pytest
 
 ## Próximas melhorias
 
-- Ampliar e versionar o léxico de sentimento, incluindo negações e expressões de múltiplas palavras.
+- Ampliar e versionar o léxico e melhorar o tratamento de expressões, ironia, negações compostas e conectores de contraste.
 - Adicionar testes para entrada vazia, espaços, texto curto e lote misto.
 - Se for necessário expor HTTP, criar uma aplicação FastAPI explícita com schemas Pydantic e documentação dos endpoints.
 - Substituir as heurísticas por um método avaliado e documentar métricas antes de chamá-lo de modelo de IA.
