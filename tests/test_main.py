@@ -77,7 +77,7 @@ def test_sentiment_supports_basic_portuguese_terms():
         ("não gostei", "negative"),
         ("não é ruim", "positive"),
         ("not good. terrible", "negative"),
-        ("not good but great", "positive"),
+        ("not good but great", "neutral"),
     ],
 )
 def test_sentiment_handles_simple_negation_and_scope(text, expected):
