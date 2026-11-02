@@ -13,6 +13,8 @@ _NEGATIVE_WORDS = {
     "negative", "poor", "ruim", "péssimo", "péssima", "triste",
     "odeio", "detestei", "odiei",
 }
+_NEGATION_WORDS = {"not", "no", "never", "não", "nunca", "nem"}
+_CONTRAST_WORDS = {"but", "however", "mas", "porém", "contudo"}
 
 
 def analyze_text(text: str) -> dict[str, Any]:
@@ -24,9 +26,32 @@ def analyze_text(text: str) -> dict[str, Any]:
         raise ValueError("Input text cannot be empty")
 
     words = cleaned_text.split()
-    tokens = re.findall(r"[a-zà-ÿ]+", cleaned_text.casefold())
-    positive_count = sum(token in _POSITIVE_WORDS for token in tokens)
-    negative_count = sum(token in _NEGATIVE_WORDS for token in tokens)
+    # Keep sentence punctuation as tokens so negation does not leak across sentences.
+    tokens = re.findall(r"[a-zà-ÿ]+|[.!?;,]", cleaned_text.casefold())
+    positive_count = 0
+    negative_count = 0
+    negation_remaining = 0
+
+    for token in tokens:
+        if token in {".", "!", "?", ";", ","} or token in _CONTRAST_WORDS:
+            negation_remaining = 0
+            continue
+        if token in _NEGATION_WORDS:
+            negation_remaining = 3
+            continue
+
+        is_positive = token in _POSITIVE_WORDS
+        is_negative = token in _NEGATIVE_WORDS
+        if is_positive or is_negative:
+            # A nearby negation flips a known sentiment word's polarity.
+            if negation_remaining > 0:
+                is_positive, is_negative = is_negative, is_positive
+            positive_count += int(is_positive)
+            negative_count += int(is_negative)
+
+        if negation_remaining > 0:
+            negation_remaining -= 1
+
     score = positive_count - negative_count
 
     if score > 0:
