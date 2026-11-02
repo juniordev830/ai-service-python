@@ -68,6 +68,24 @@ def test_sentiment_supports_basic_portuguese_terms():
     assert analyze_text("Estou feliz, gostei!")["sentiment"] == "positive"
     assert analyze_text("Estou triste e ruim")["sentiment"] == "negative"
 
+
+@pytest.mark.parametrize(
+    ("text", "expected"),
+    [
+        ("not good", "negative"),
+        ("never excellent", "negative"),
+        ("não gostei", "negative"),
+        ("não é ruim", "positive"),
+        ("not good. terrible", "negative"),
+        ("not good but great", "positive"),
+    ],
+)
+def test_sentiment_handles_simple_negation_and_scope(text, expected):
+    result = analyze_text(text)
+    assert result["sentiment"] == expected
+    assert result["method"] == "lexicon_heuristic"
+
+
 def test_language_is_not_claimed_without_language_detection():
     result = analyze_text("Olá, este é um texto em português")
     assert result["language"] == "undetermined"
