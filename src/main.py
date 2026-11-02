@@ -1,10 +1,22 @@
 """Core text processing helpers for the experimental AI service."""
 
+import re
 from typing import Any
+
+_POSITIVE_WORDS = {
+    "amazing", "awesome", "excellent", "good", "great", "happy", "love",
+    "nice", "positive", "wonderful", "ótimo", "ótima", "excelente",
+    "bom", "boa", "feliz", "adoro", "amei", "gostei",
+}
+_NEGATIVE_WORDS = {
+    "awful", "bad", "hate", "horrible", "sad", "terrible", "worst",
+    "negative", "poor", "ruim", "péssimo", "péssima", "triste",
+    "odeio", "detestei", "odiei",
+}
 
 
 def analyze_text(text: str) -> dict[str, Any]:
-    """Return basic metadata and a clearly heuristic sentiment label."""
+    """Return basic metadata and a lexicon-based, explicitly heuristic sentiment."""
     if not isinstance(text, str):
         raise TypeError("text must be a string")
     cleaned_text = text.strip()
@@ -12,16 +24,28 @@ def analyze_text(text: str) -> dict[str, Any]:
         raise ValueError("Input text cannot be empty")
 
     words = cleaned_text.split()
-    word_count = len(words)
-    confidence = min(0.99, round(0.5 + (word_count * 0.05), 2))
-    sentiment = "positive" if word_count > 3 else "neutral"
+    tokens = re.findall(r"[a-zà-ÿ]+", cleaned_text.casefold())
+    positive_count = sum(token in _POSITIVE_WORDS for token in tokens)
+    negative_count = sum(token in _NEGATIVE_WORDS for token in tokens)
+    score = positive_count - negative_count
+
+    if score > 0:
+        sentiment = "positive"
+    elif score < 0:
+        sentiment = "negative"
+    else:
+        sentiment = "neutral"
+
+    # This is a heuristic score, not a statistically calibrated probability.
+    confidence = min(0.95, round(0.5 + 0.1 * abs(score), 2))
 
     return {
         "text": cleaned_text,
-        "word_count": word_count,
+        "word_count": len(words),
         "sentiment": sentiment,
         "confidence": confidence,
         "language": "undetermined",
+        "method": "lexicon_heuristic",
     }
 
 
