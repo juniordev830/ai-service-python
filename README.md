@@ -7,7 +7,8 @@ Módulo Python experimental para análise básica de texto e processamento em lo
 - Rejeita texto vazio.
 - Remove espaços externos.
 - Conta palavras.
-- Retorna um rótulo de sentimento heurístico e uma confiança estimada por regra simples.
+- Estima sentimento por um pequeno léxico positivo/negativo em inglês e português.
+- Informa um escore heurístico (`confidence`) e o método usado; esse escore não é uma probabilidade calibrada.
 - Processa uma lista de textos, ignorando itens vazios.
 
 > O rótulo de sentimento e a confiança são regras didáticas, não previsões de um modelo de Machine Learning validado. Não use os resultados para decisões reais.
@@ -63,7 +64,7 @@ pytest
 
 ## Próximas melhorias
 
-- Separar as regras de análise em funções testáveis.
+- Ampliar e versionar o léxico de sentimento, incluindo negações e expressões de múltiplas palavras.
 - Adicionar testes para entrada vazia, espaços, texto curto e lote misto.
 - Se for necessário expor HTTP, criar uma aplicação FastAPI explícita com schemas Pydantic e documentação dos endpoints.
 - Substituir as heurísticas por um método avaliado e documentar métricas antes de chamá-lo de modelo de IA.
