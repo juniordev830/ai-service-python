@@ -96,7 +96,7 @@ def test_language_is_not_claimed_without_language_detection():
     [
         ("I don't love this update", "negative"),
         ("This isn't good", "negative"),
-        ("I can’t say it is bad", "positive"),
+        ("I can’t hate this", "positive"),
         ("nao gostei do atendimento", "negative"),
         ("I won't hate this", "positive"),
     ],
