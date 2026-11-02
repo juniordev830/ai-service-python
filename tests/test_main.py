@@ -45,6 +45,29 @@ def test_batch_analyze_rejects_non_string_item():
     with pytest.raises(TypeError, match=r"texts\[1\] must be a string"):
         batch_analyze(["valid text", None])
 
+
+def test_sentiment_detects_negative_words_independently_of_text_length():
+    result = analyze_text("This is a terrible and bad experience")
+    assert result["sentiment"] == "negative"
+    assert result["confidence"] > 0.5
+    assert result["method"] == "lexicon_heuristic"
+
+
+def test_sentiment_is_case_insensitive_and_ignores_punctuation():
+    result = analyze_text("GREAT!!!")
+    assert result["sentiment"] == "positive"
+
+
+def test_balanced_positive_and_negative_terms_are_neutral():
+    result = analyze_text("good but bad")
+    assert result["sentiment"] == "neutral"
+    assert result["confidence"] == 0.5
+
+
+def test_sentiment_supports_basic_portuguese_terms():
+    assert analyze_text("Estou feliz, gostei!")["sentiment"] == "positive"
+    assert analyze_text("Estou triste e ruim")["sentiment"] == "negative"
+
 def test_language_is_not_claimed_without_language_detection():
     result = analyze_text("Olá, este é um texto em português")
     assert result["language"] == "undetermined"
