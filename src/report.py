@@ -7,6 +7,8 @@ labels are heuristic demonstrations, not validated predictions.
 from __future__ import annotations
 
 import argparse
+import csv
+import io
 import json
 from pathlib import Path
 from typing import Any, Sequence
@@ -105,13 +107,45 @@ def compare_texts(current: list[str], baseline: list[str]) -> dict[str, Any]:
     }
 
 
+def report_to_csv(report: dict[str, Any]) -> str:
+    """Export label distributions from summarize_texts/compare_texts.
+
+    Only fixed labels and numeric aggregates are exported. Source text and
+    user-controlled file names are never written to spreadsheet cells.
+    """
+    output = io.StringIO(newline="")
+    writer = csv.writer(output, lineterminator="\n")
+    if "changes" in report:
+        writer.writerow([
+            "sentiment", "current_count", "baseline_count", "count_delta",
+            "current_percent", "baseline_percent", "percentage_point_delta",
+        ])
+        for label in SENTIMENT_LABELS:
+            change = report["changes"][label]
+            writer.writerow([
+                label, report["current"]["sentiments"][label],
+                report["baseline"]["sentiments"][label], change["count_delta"],
+                change["current_percent"], change["baseline_percent"],
+                change["percentage_point_delta"],
+            ])
+    else:
+        writer.writerow(["sentiment", "count", "percent"])
+        for label in SENTIMENT_LABELS:
+            count = report["sentiments"][label]
+            percent = round(100 * count / report["analyzed"], 2) if report["analyzed"] else None
+            writer.writerow([label, count, percent])
+    return output.getvalue()
+
+
 def cli_main(argv: Sequence[str] | None = None) -> int:
-    """Entry point: print JSON summary to stdout, errors to stderr."""
+    """Print JSON summary or CSV distributions to stdout, errors to stderr."""
     parser = argparse.ArgumentParser(
         description="Summarize sentiment labels in a local JSON list of text samples"
     )
     parser.add_argument("input", type=Path, help="UTF-8 JSON file containing strings")
     parser.add_argument("--baseline", type=Path, help="Compare with a previous UTF-8 JSON batch")
+    parser.add_argument("--format", choices=("json", "csv"), default="json",
+                        help="Output format (default: json); CSV exports label distributions")
     args = parser.parse_args(argv)
 
     try:
@@ -121,7 +155,10 @@ def cli_main(argv: Sequence[str] | None = None) -> int:
     except (ValueError, TypeError, OSError) as exc:
         parser.exit(2, f"Error: {exc}\n")
 
-    print(json.dumps(summary, ensure_ascii=False, indent=2))
+    if args.format == "csv":
+        print(report_to_csv(summary), end="")
+    else:
+        print(json.dumps(summary, ensure_ascii=False, indent=2))
     return 0
 
 

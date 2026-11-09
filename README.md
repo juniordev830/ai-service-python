@@ -106,3 +106,20 @@ Cada arquivo conserva os limites de tamanho e quantidade do relatório simples.
 Nenhum texto original é incluído; as variações são descritivas, sem indicar
 significância estatística ou melhora de qualidade. Sem `--baseline`, a saída
 original do relatório permanece a mesma.
+
+### Exportar distribuições para planilhas
+
+```bash
+python -m src.report examples/textos.json --format csv
+python -m src.report examples/textos.json --baseline lote-anterior.json --format csv
+```
+
+CSV usa vírgulas como separador e ponto decimal. O relatório simples exporta
+`sentiment,count,percent`; a comparação exporta as contagens de cada lote,
+diferença de contagem, percentuais e variação em pontos percentuais.
+Taxas indefinidas aparecem como células vazias. Há uma linha por rótulo de
+sentimento, sem os textos originais, nomes de arquivos ou fórmulas fornecidas
+na entrada. Os percentuais usam apenas os textos analisados.
+O formato JSON, ainda padrão, conserva os metadados completos, como textos
+vazios ignorados e total de palavras. CSV é apenas uma distribuição descritiva
+dos rótulos heurísticos, não uma avaliação estatística do conteúdo.
