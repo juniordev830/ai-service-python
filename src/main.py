@@ -1,6 +1,7 @@
 """Core text processing helpers for the experimental AI service."""
 
 import re
+import unicodedata
 from typing import Any
 
 _POSITIVE_WORDS = {
@@ -35,7 +36,10 @@ def analyze_text(text: str) -> dict[str, Any]:
 
     words = cleaned_text.split()
     # Keep sentence punctuation as tokens so negation does not leak across sentences.
-    tokens = re.findall(r"[a-zà-ÿ]+(?:['’][a-zà-ÿ]+)?|[.!?;,]", cleaned_text.casefold())
+    # Canonically equivalent accents must match the same lexicon entries.
+    # Keep the original cleaned text in the response.
+    normalized_text = unicodedata.normalize("NFC", cleaned_text.casefold())
+    tokens = re.findall(r"[a-zà-ÿ]+(?:['’][a-zà-ÿ]+)?|[.!?;,]", normalized_text)
     positive_count = 0
     negative_count = 0
     negation_remaining = 0
@@ -93,6 +97,8 @@ def batch_analyze(texts: list[str]) -> list[dict[str, Any]]:
     for index, text in enumerate(texts):
         if not isinstance(text, str):
             raise TypeError(f"texts[{index}] must be a string")
+        if len(text) > MAX_TEXT_CHARACTERS:
+            raise ValueError(f"texts[{index}] must contain at most {MAX_TEXT_CHARACTERS} characters")
         if text.strip():
             results.append(analyze_text(text))
     return results

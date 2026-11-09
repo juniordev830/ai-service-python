@@ -1,6 +1,6 @@
 # AI Service Python
 
-Módulo Python experimental para análise básica de texto e processamento em lote. Apesar de FastAPI e Uvicorn estarem listados nas dependências, o ponto de entrada atual `src/main.py` é uma biblioteca/exemplo executável por terminal, não uma aplicação FastAPI pronta.
+Módulo Python experimental para análise básica de texto e processamento em lote. O ponto de entrada `src/main.py` é uma biblioteca/exemplo executável por terminal. O analisador usa apenas a biblioteca padrão; `requirements.txt` contém a dependência de testes.
 
 ## Funcionalidades atuais
 
@@ -8,9 +8,13 @@ Módulo Python experimental para análise básica de texto e processamento em lo
 - Remove espaços externos.
 - Conta palavras.
 - Estima sentimento por um pequeno léxico positivo/negativo em inglês e português.
+- Trata acentos Unicode compostos e decompostos de forma equivalente, preservando o texto original na resposta (exceto espaços externos).
 - Considera negações simples (`not`, `never`, `não`, `nao`, `nunca`) e contrações comuns em inglês (`don't`, `isn't`, `can't`) em uma janela curta e reinicia o escopo em pontuação ou conectores de contraste.
 - Informa um escore heurístico (`confidence`) e o método usado; esse escore não é uma probabilidade calibrada.
 - Processa uma lista de textos, ignorando itens vazios. Cada texto pode ter até **10.000 caracteres** e cada lote pode conter até **100 itens**, para limitar o trabalho por chamada.
+
+O limite de caracteres é conferido na entrada original, inclusive em itens
+compostos apenas por espaços, antes de ignorá-los ou normalizar seus acentos.
 
 > O rótulo de sentimento e a confiança são regras didáticas, não previsões de um modelo de Machine Learning validado. Não use os resultados para decisões reais.
 
