@@ -89,3 +89,20 @@ python -m pytest tests/test_report.py -q
 A saída é um objeto JSON. Por padrão, **o relatório não reproduz os textos originais**, ajudando a reduzir exposição acidental ao compartilhar estatísticas. O arquivo de entrada precisa existir localmente, ter no máximo 2 MB, conter no máximo 100 entradas e cada texto precisa respeitar o limite do analisador (10.000 caracteres).
 
 O método continua sendo uma **heurística de léxico**, não um modelo de linguagem treinado nem uma classificação confiável para decisões importantes. O programa não recebe dados pela rede e não persiste relatórios automaticamente. Ao usar exemplos próprios, evite dados pessoais ou confidenciais.
+
+### Comparar dois lotes
+
+```bash
+python -m src.report examples/textos.json --baseline lote-anterior.json
+```
+
+`--baseline` compara o lote atual com outro arquivo JSON no mesmo formato.
+A saída inclui os dois resumos e, para cada sentimento, a diferença de contagem,
+os percentuais de cada lote e a variação em **pontos percentuais** (atual menos
+anterior). Textos vazios não entram no denominador. Sem textos analisados em
+um dos lotes, seu percentual e a variação são `null`, pois não há taxa a comparar.
+Os percentuais são arredondados para duas casas e podem não somar exatamente 100.
+Cada arquivo conserva os limites de tamanho e quantidade do relatório simples.
+Nenhum texto original é incluído; as variações são descritivas, sem indicar
+significância estatística ou melhora de qualidade. Sem `--baseline`, a saída
+original do relatório permanece a mesma.
