@@ -88,3 +88,23 @@ def test_cli_errors_exit_with_nonzero_code(tmp_path, capsys):
         cli_main([str(missing)])
     assert exc.value.code == 2
     assert "Error:" in capsys.readouterr().err
+
+
+def test_sentiment_percentages_use_analyzed_samples_only():
+    report = summarize_texts(["good", "bad", "ordinary", " ", ""])
+    assert report["analyzed"] == 3
+    assert report["sentiment_percentages"] == {
+        "positive": 33.33,
+        "negative": 33.33,
+        "neutral": 33.33,
+    }
+
+
+def test_empty_report_percentages_are_zero():
+    report = summarize_texts([" ", ""])
+    assert report["analyzed"] == 0
+    assert report["sentiment_percentages"] == {
+        "positive": 0.0,
+        "negative": 0.0,
+        "neutral": 0.0,
+    }
