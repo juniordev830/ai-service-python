@@ -63,7 +63,7 @@ def load_texts(path: Path) -> list[str]:
     if len(raw) > MAX_INPUT_BYTES:
         raise ValueError(f"Input exceeds {MAX_INPUT_BYTES} bytes")
     try:
-        data: Any = json.loads(raw.decode("utf-8"))
+        data: Any = json.loads(raw.decode("utf-8-sig"))
     except (UnicodeDecodeError, json.JSONDecodeError) as exc:
         raise ValueError("Input must be valid UTF-8 JSON") from exc
 
