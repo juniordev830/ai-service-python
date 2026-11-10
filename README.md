@@ -86,7 +86,7 @@ python -m src.report examples/textos.json
 python -m pytest tests/test_report.py -q
 ```
 
-A saída é um objeto JSON. Por padrão, **o relatório não reproduz os textos originais**, ajudando a reduzir exposição acidental ao compartilhar estatísticas. O arquivo de entrada precisa existir localmente, ter no máximo 2 MB, conter no máximo 100 entradas e cada texto precisa respeitar o limite do analisador (10.000 caracteres).
+A saída é um objeto JSON. Por padrão, **o relatório não reproduz os textos originais**, ajudando a reduzir exposição acidental ao compartilhar estatísticas. O arquivo de entrada deve ser JSON UTF-8 (com ou sem BOM UTF-8; UTF-16 não é aceito), existir localmente, ter no máximo 2 MB, conter no máximo 100 entradas e cada texto precisa respeitar o limite do analisador (10.000 caracteres).
 
 O método continua sendo uma **heurística de léxico**, não um modelo de linguagem treinado nem uma classificação confiável para decisões importantes. O programa não recebe dados pela rede e não persiste relatórios automaticamente. Ao usar exemplos próprios, evite dados pessoais ou confidenciais.
 
