@@ -63,7 +63,7 @@ def test_rejects_wrong_json_shapes_or_encoding(tmp_path, payload):
 
 def test_utf8_bom_is_accepted_without_altering_accented_text(tmp_path):
     file = tmp_path / "bom.json"
-    file.write_bytes(b"\\xef\\xbb\\xbf" + '["ótimo", "não gostei"]'.encode("utf-8"))
+    file.write_bytes(bytes([0xEF, 0xBB, 0xBF]) + '["ótimo", "não gostei"]'.encode("utf-8"))
     assert load_texts(file) == ["ótimo", "não gostei"]
 
 
