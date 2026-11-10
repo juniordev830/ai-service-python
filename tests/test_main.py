@@ -1,6 +1,7 @@
 """Regression tests for the experimental text analysis helpers."""
 
 import pytest
+import unicodedata
 
 from src.main import analyze_text, batch_analyze
 
@@ -119,3 +120,23 @@ def test_batch_accepts_maximum_size_and_checks_each_item_length():
     assert len(batch_analyze(["good"] * 100)) == 100
     with pytest.raises(ValueError, match="at most 10000 characters"):
         batch_analyze(["good", "x" * 10001])
+
+
+@pytest.mark.parametrize("text", ["ótimo", "péssimo", "não gostei", "não é ruim"])
+def test_unicode_equivalent_texts_have_the_same_sentiment(text):
+    decomposed = unicodedata.normalize("NFD", text)
+    expected = analyze_text(text)
+    actual = analyze_text(decomposed)
+    assert actual["sentiment"] == expected["sentiment"]
+    assert actual["confidence"] == expected["confidence"]
+    assert actual["text"] == decomposed
+
+
+@pytest.mark.parametrize("blank", [" ", "\t", "\n", "\u2003"])
+def test_batch_rejects_oversized_blank_items(blank):
+    with pytest.raises(ValueError, match="at most 10000 characters"):
+        batch_analyze(["good", blank * 10001])
+
+
+def test_batch_ignores_blank_items_at_the_length_limit():
+    assert batch_analyze([" " * 10000]) == []

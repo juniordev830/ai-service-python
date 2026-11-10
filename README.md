@@ -1,6 +1,6 @@
 # AI Service Python
 
-Módulo Python experimental para análise básica de texto e processamento em lote. Apesar de FastAPI e Uvicorn estarem listados nas dependências, o ponto de entrada atual `src/main.py` é uma biblioteca/exemplo executável por terminal, não uma aplicação FastAPI pronta.
+Módulo Python experimental para análise básica de texto e processamento em lote. O ponto de entrada `src/main.py` é uma biblioteca/exemplo executável por terminal. O analisador usa apenas a biblioteca padrão; `requirements.txt` contém a dependência de testes.
 
 ## Funcionalidades atuais
 
@@ -8,9 +8,13 @@ Módulo Python experimental para análise básica de texto e processamento em lo
 - Remove espaços externos.
 - Conta palavras.
 - Estima sentimento por um pequeno léxico positivo/negativo em inglês e português.
+- Trata acentos Unicode compostos e decompostos de forma equivalente, preservando o texto original na resposta (exceto espaços externos).
 - Considera negações simples (`not`, `never`, `não`, `nao`, `nunca`) e contrações comuns em inglês (`don't`, `isn't`, `can't`) em uma janela curta e reinicia o escopo em pontuação ou conectores de contraste.
 - Informa um escore heurístico (`confidence`) e o método usado; esse escore não é uma probabilidade calibrada.
 - Processa uma lista de textos, ignorando itens vazios. Cada texto pode ter até **10.000 caracteres** e cada lote pode conter até **100 itens**, para limitar o trabalho por chamada.
+
+O limite de caracteres é conferido na entrada original, inclusive em itens
+compostos apenas por espaços, antes de ignorá-los ou normalizar seus acentos.
 
 > O rótulo de sentimento e a confiança são regras didáticas, não previsões de um modelo de Machine Learning validado. Não use os resultados para decisões reais.
 
@@ -82,6 +86,40 @@ python -m src.report examples/textos.json
 python -m pytest tests/test_report.py -q
 ```
 
-A saída é um objeto JSON. Por padrão, **o relatório não reproduz os textos originais**, ajudando a reduzir exposição acidental ao compartilhar estatísticas. O arquivo de entrada precisa existir localmente, ter no máximo 2 MB, conter no máximo 100 entradas e cada texto precisa respeitar o limite do analisador (10.000 caracteres).
+A saída é um objeto JSON. Por padrão, **o relatório não reproduz os textos originais**, ajudando a reduzir exposição acidental ao compartilhar estatísticas. O arquivo de entrada deve ser JSON UTF-8 (com ou sem BOM UTF-8; UTF-16 não é aceito), existir localmente, ter no máximo 2 MB, conter no máximo 100 entradas e cada texto precisa respeitar o limite do analisador (10.000 caracteres).
 
 O método continua sendo uma **heurística de léxico**, não um modelo de linguagem treinado nem uma classificação confiável para decisões importantes. O programa não recebe dados pela rede e não persiste relatórios automaticamente. Ao usar exemplos próprios, evite dados pessoais ou confidenciais.
+
+### Comparar dois lotes
+
+```bash
+python -m src.report examples/textos.json --baseline lote-anterior.json
+```
+
+`--baseline` compara o lote atual com outro arquivo JSON no mesmo formato.
+A saída inclui os dois resumos e, para cada sentimento, a diferença de contagem,
+os percentuais de cada lote e a variação em **pontos percentuais** (atual menos
+anterior). Textos vazios não entram no denominador. Sem textos analisados em
+um dos lotes, seu percentual e a variação são `null`, pois não há taxa a comparar.
+Os percentuais são arredondados para duas casas e podem não somar exatamente 100.
+Cada arquivo conserva os limites de tamanho e quantidade do relatório simples.
+Nenhum texto original é incluído; as variações são descritivas, sem indicar
+significância estatística ou melhora de qualidade. Sem `--baseline`, a saída
+original do relatório permanece a mesma.
+
+### Exportar distribuições para planilhas
+
+```bash
+python -m src.report examples/textos.json --format csv
+python -m src.report examples/textos.json --baseline lote-anterior.json --format csv
+```
+
+CSV usa vírgulas como separador e ponto decimal. O relatório simples exporta
+`sentiment,count,percent`; a comparação exporta as contagens de cada lote,
+diferença de contagem, percentuais e variação em pontos percentuais.
+Taxas indefinidas aparecem como células vazias. Há uma linha por rótulo de
+sentimento, sem os textos originais, nomes de arquivos ou fórmulas fornecidas
+na entrada. Os percentuais usam apenas os textos analisados.
+O formato JSON, ainda padrão, conserva os metadados completos, como textos
+vazios ignorados e total de palavras. CSV é apenas uma distribuição descritiva
+dos rótulos heurísticos, não uma avaliação estatística do conteúdo.
