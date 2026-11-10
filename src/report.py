@@ -40,12 +40,19 @@ def summarize_texts(texts: list[str]) -> dict[str, Any]:
         total_words += words
         longest_text_words = max(longest_text_words, words)
 
+    # Use analyzed texts as the denominator; skipped empty entries are excluded.
+    percentages = {
+        label: round(100 * count / len(results), 2) if results else 0.0
+        for label, count in counts.items()
+    }
+
     return {
         "method": "lexicon_heuristic",
         "submitted": len(texts),
         "analyzed": len(results),
         "ignored_empty": len(texts) - len(results),
         "sentiments": counts,
+        "sentiment_percentages": percentages,
         "total_words": total_words,
         "longest_text_words": longest_text_words,
         "notice": "Heuristic demonstration; not a calibrated AI prediction.",
