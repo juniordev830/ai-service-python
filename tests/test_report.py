@@ -61,6 +61,19 @@ def test_rejects_wrong_json_shapes_or_encoding(tmp_path, payload):
         load_texts(file)
 
 
+def test_utf8_bom_is_accepted_without_altering_accented_text(tmp_path):
+    file = tmp_path / "bom.json"
+    file.write_bytes(b"\\xef\\xbb\\xbf" + '["ótimo", "não gostei"]'.encode("utf-8"))
+    assert load_texts(file) == ["ótimo", "não gostei"]
+
+
+def test_utf16_bom_is_not_accepted_as_utf8(tmp_path):
+    file = tmp_path / "utf16.json"
+    file.write_bytes('["bom"]'.encode("utf-16"))
+    with pytest.raises(ValueError, match="UTF-8 JSON"):
+        load_texts(file)
+
+
 def test_rejects_oversized_local_file(tmp_path):
     file = tmp_path / "large.json"
     file.write_bytes(b" " * (MAX_INPUT_BYTES + 1))
