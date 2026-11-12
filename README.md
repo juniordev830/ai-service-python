@@ -123,3 +123,7 @@ na entrada. Os percentuais usam apenas os textos analisados.
 O formato JSON, ainda padrão, conserva os metadados completos, como textos
 vazios ignorados e total de palavras. CSV é apenas uma distribuição descritiva
 dos rótulos heurísticos, não uma avaliação estatística do conteúdo.
+
+## Validação e manutenção
+
+Para revisar alterações neste projeto, consulte o [guia técnico de validação](docs/GUIA_DE_VALIDACAO.md), com comandos, cenários de regressão e próximos incrementos.
