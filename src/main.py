@@ -20,6 +20,8 @@ _NEGATION_WORDS = {
     "can't", "cannot", "won't",
 }
 _CONTRAST_WORDS = {"but", "however", "mas", "porém", "contudo"}
+_SCOPE_BOUNDARIES = ".!?;,。！？；，"
+_TOKENS = re.compile(rf"\w+(?:['’]\w+)?|[{re.escape(_SCOPE_BOUNDARIES)}]")
 MAX_TEXT_CHARACTERS = 10_000
 MAX_BATCH_ITEMS = 100
 
@@ -39,14 +41,14 @@ def analyze_text(text: str) -> dict[str, Any]:
     # Canonically equivalent accents must match the same lexicon entries.
     # Keep the original cleaned text in the response.
     normalized_text = unicodedata.normalize("NFC", cleaned_text.casefold())
-    tokens = re.findall(r"[a-zà-ÿ]+(?:['’][a-zà-ÿ]+)?|[.!?;,]", normalized_text)
+    tokens = _TOKENS.findall(normalized_text)
     positive_count = 0
     negative_count = 0
     negation_remaining = 0
 
     for token in tokens:
         token = token.replace("’", "'")
-        if token in {".", "!", "?", ";", ","} or token in _CONTRAST_WORDS:
+        if token in _SCOPE_BOUNDARIES or token in _CONTRAST_WORDS:
             negation_remaining = 0
             continue
         if token in _NEGATION_WORDS:
