@@ -20,6 +20,13 @@ from src.main import (
         ("not good. excellent", "neutral"),
         ("bad but great", "neutral"),
         ("ordinary words", "neutral"),
+        ("good_news", "neutral"),
+        ("Жbad", "neutral"),
+        ("bom2", "neutral"),
+        ("não。 bom", "positive"),
+        ("não мир мир мир bom", "positive"),
+        ("don’t like this", "neutral"),
+        ("isn’t good", "negative"),
     ],
 )
 def test_sentiment_and_negation_boundaries(sample, expected):

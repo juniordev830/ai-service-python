@@ -9,7 +9,7 @@ Módulo Python experimental para análise básica de texto e processamento em lo
 - Conta palavras.
 - Estima sentimento por um pequeno léxico positivo/negativo em inglês e português.
 - Trata acentos Unicode compostos e decompostos de forma equivalente, preservando o texto original na resposta (exceto espaços externos).
-- Considera negações simples (`not`, `never`, `não`, `nao`, `nunca`) e contrações comuns em inglês (`don't`, `isn't`, `can't`) em uma janela curta e reinicia o escopo em pontuação ou conectores de contraste.
+- Considera negações simples (`not`, `never`, `não`, `nao`, `nunca`) e contrações comuns em inglês (`don't`, `isn't`, `can't`) em uma janela curta e reinicia o escopo em pontuação, incluindo variantes de largura completa, ou conectores de contraste. Identificadores como `good_news` e `bom2` são tratados como tokens inteiros.
 - Informa um escore heurístico (`confidence`) e o método usado; esse escore não é uma probabilidade calibrada.
 - Processa uma lista de textos, ignorando itens vazios. Cada texto pode ter até **10.000 caracteres** e cada lote pode conter até **100 itens**, para limitar o trabalho por chamada.
 
