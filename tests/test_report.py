@@ -16,6 +16,7 @@ def test_mixed_sentiments_and_empty_items_are_counted():
     assert report["sentiments"] == {"positive": 1, "negative": 1, "neutral": 1}
     assert report["total_words"] == 8
     assert report["longest_text_words"] == 3
+    assert report["median_text_words"] == 3
     assert report["method"] == "lexicon_heuristic"
     assert original[0] == "Adorei, ótimo trabalho!"
 
@@ -26,6 +27,12 @@ def test_empty_batch_generates_explicit_zeros():
     assert report["sentiments"] == {"positive": 0, "negative": 0, "neutral": 0}
     assert report["total_words"] == 0
     assert report["longest_text_words"] == 0
+    assert report["median_text_words"] is None
+
+
+def test_median_excludes_blank_text_and_averages_the_middle_pair():
+    report = summarize_texts(["um", "", "um dois três quatro"])
+    assert report["median_text_words"] == 2.5
 
 
 def test_does_not_leak_original_text_into_report():

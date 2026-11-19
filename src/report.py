@@ -11,6 +11,7 @@ import csv
 import io
 import json
 from pathlib import Path
+from statistics import median
 from typing import Any, Sequence
 
 from .main import batch_analyze
@@ -29,16 +30,13 @@ def summarize_texts(texts: list[str]) -> dict[str, Any]:
         raise TypeError("texts must be a list")
     results = batch_analyze(texts)
     counts = {label: 0 for label in SENTIMENT_LABELS}
-    total_words = 0
-    longest_text_words = 0
+    word_counts = []
     for result in results:
         sentiment = result["sentiment"]
         if sentiment not in counts:
             raise ValueError("Unexpected sentiment label in analysis result")
         counts[sentiment] += 1
-        words = result["word_count"]
-        total_words += words
-        longest_text_words = max(longest_text_words, words)
+        word_counts.append(result["word_count"])
 
     # Use analyzed texts as the denominator; skipped empty entries are excluded.
     percentages = {
@@ -53,8 +51,9 @@ def summarize_texts(texts: list[str]) -> dict[str, Any]:
         "ignored_empty": len(texts) - len(results),
         "sentiments": counts,
         "sentiment_percentages": percentages,
-        "total_words": total_words,
-        "longest_text_words": longest_text_words,
+        "total_words": sum(word_counts),
+        "longest_text_words": max(word_counts, default=0),
+        "median_text_words": median(word_counts) if word_counts else None,
         "notice": "Heuristic demonstration; not a calibrated AI prediction.",
     }
 
