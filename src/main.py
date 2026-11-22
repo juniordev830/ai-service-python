@@ -45,13 +45,16 @@ def analyze_text(text: str) -> dict[str, Any]:
     positive_count = 0
     negative_count = 0
     negation_remaining = 0
+    negation_parity = False
 
     for token in tokens:
         token = token.replace("’", "'")
         if token in _SCOPE_BOUNDARIES or token in _CONTRAST_WORDS:
             negation_remaining = 0
+            negation_parity = False
             continue
         if token in _NEGATION_WORDS:
+            negation_parity = not negation_parity
             negation_remaining = 3
             continue
 
@@ -59,13 +62,15 @@ def analyze_text(text: str) -> dict[str, Any]:
         is_negative = token in _NEGATIVE_WORDS
         if is_positive or is_negative:
             # A nearby negation flips a known sentiment word's polarity.
-            if negation_remaining > 0:
+            if negation_remaining > 0 and negation_parity:
                 is_positive, is_negative = is_negative, is_positive
             positive_count += int(is_positive)
             negative_count += int(is_negative)
 
         if negation_remaining > 0:
             negation_remaining -= 1
+            if negation_remaining == 0:
+                negation_parity = False
 
     score = positive_count - negative_count
 
